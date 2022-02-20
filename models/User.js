@@ -33,6 +33,10 @@ const User = sequelize.define(
             allowNull: false,
             default: 'user'
         },
+        phoneNumber:{
+          type: Sequelize.STRING,
+          allowNull: true
+        },
         profilePictureSrc: {
             type: Sequelize.STRING,
             allowNull: true
