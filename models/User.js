@@ -16,11 +16,28 @@ const User = sequelize.define(
             type: Sequelize.STRING,
             allowNull: false
         },
+        birthday: {
+          type: Sequelize.DATE,
+          allowNull: false
+        },
+        surname: {
+            type: Sequelize.STRING,
+            allowNull: true
+        },
+        name: {
+            type: Sequelize.STRING,
+            allowNull: true
+        },
         role: {
             type: Sequelize.STRING,
             allowNull: false,
             default: 'user'
+        },
+        profilePictureSrc: {
+            type: Sequelize.STRING,
+            allowNull: true
         }
     })
 
 module.exports = User
+
