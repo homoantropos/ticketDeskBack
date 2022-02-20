@@ -12,7 +12,7 @@ class User_controller {
                 let password = await bcrypt.hash(req.body.password, salt);
                 const role = await ac.getRole(req.body.role);
                 if (typeof role === 'string') {
-                    const user = await User.create({
+                    await User.create({
                         email: req.body.email,
                         password,
                         birthday: new Date(req.body.birthday),
@@ -21,6 +21,9 @@ class User_controller {
                         name: req.body.name,
                         phoneNumber: req.body.phoneNumber,
                         profilePictureSrc: req.body.profilePictureSrc
+                    });
+                    const user = await User.scope('userResponse').findOne({
+                        where: {email: req.body.email}
                     });
                     res.status(201).json(user);
                 } else {
