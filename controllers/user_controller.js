@@ -16,7 +16,11 @@ class User_controller {
                         email: req.body.email,
                         password,
                         birthday: new Date(req.body.birthday),
-                        role
+                        role,
+                        surname: req.body.surname,
+                        name: req.body.name,
+                        phoneNumber: req.body.phoneNumber,
+                        profilePictureSrc: req.body.profilePictureSrc
                     });
                     res.status(201).json(user);
                 } else {
