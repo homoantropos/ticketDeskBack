@@ -7,7 +7,6 @@ const User = require('../models/User');
 class User_controller {
 
     async registerUser(req, res) {
-        if (req.user.role === 'superAdmin') {
             try {
                 const salt = await bcrypt.genSalt(10);
                 let password = await bcrypt.hash(req.body.password, salt);
@@ -16,6 +15,7 @@ class User_controller {
                     const user = await User.create({
                         email: req.body.email,
                         password,
+                        birthday: new Date(req.body.birthday),
                         role
                     });
                     res.status(201).json(user);
@@ -29,11 +29,6 @@ class User_controller {
                     message: error.message ? error.message : error
                 })
             }
-        } else {
-            res.status(401).json({
-                message: 'Ви не маєте права реєструвати учасників, зверніться до адміністратора сайту.'
-            })
-        }
     }
 
     async login(req, res) {
