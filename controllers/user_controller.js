@@ -8,7 +8,6 @@ class User_controller {
 
     async registerUser(req, res) {
             try {
-                console.log(req.body);
                 const salt = await bcrypt.genSalt(10);
                 let password = await bcrypt.hash(req.body.password, salt);
                 const role = await ac.getRole(req.body.role);
