@@ -8,6 +8,7 @@ class User_controller {
 
     async registerUser(req, res) {
             try {
+                console.log(req);
                 const salt = await bcrypt.genSalt(10);
                 let password = await bcrypt.hash(req.body.password, salt);
                 const role = await ac.getRole(req.body.role);
@@ -20,7 +21,7 @@ class User_controller {
                         surname: req.body.surname,
                         name: req.body.name,
                         phoneNumber: req.body.phoneNumber,
-                        profilePictureSrc: req.body.profilePictureSrc
+                        profilePictureSrc: req.file ? req.file.path : ''
                     });
                     const user = await User.scope('userResponse').findOne({
                         where: {email: req.body.email}

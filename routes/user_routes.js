@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const controller = require('../controllers/user_controller');
+const upload = require('../middleware/upload')
 
-router.post('/register', controller.registerUser);
+router.post('/register', upload.single('image'), controller.registerUser);
 router.patch('/:id', passport.authenticate('jwt', {session: false}), controller.updateUser);
 router.post('/login', controller.login);
 router.get('/role', passport.authenticate('jwt', {session: false}, controller.getRole));
