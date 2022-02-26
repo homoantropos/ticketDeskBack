@@ -58,9 +58,7 @@ class User_controller {
                         userId: candidate.id
                     }, keys.jwt, {expiresIn: 60 * 60});
                     res.status(200).json({
-                        token: `Bearer ${token}`,
-                        userRole: candidate.role,
-                        userEmail: candidate.email
+                        token: `Bearer ${token}`
                     });
                 } else {
                     res.status(401).json({
@@ -76,24 +74,27 @@ class User_controller {
     }
 
     async updateUser(req, res) {
-        if (req.user.role === 'superAdmin') {
-            try {
+             try {
                 const salt = await bcrypt.genSalt(10);
                 let password = await bcrypt.hash(req.body.password, salt);
                 const role = await ac.getRole(req.body.role);
                 if (typeof role === 'string') {
                     await User.update({
-                            email: req.body.email,
-                            password,
-                            role
-                        },
-                        {
-                            where: {
-                                id: req.params.id
-                            }
-                        })
+                        email: req.body.email,
+                        password,
+                        birthday: new Date(req.body.birthday),
+                        role,
+                        surname: req.body.surname,
+                        name: req.body.name,
+                        phoneNumber: req.body.phoneNumber,
+                        profilePictureSrc: req.file ? req.file.path : ''
+                    },
+                        {where: {email: req.user.email}});
+                    const user = await User.scope('userResponse').findOne({
+                        where: {email: req.body.email}
+                    });
                     res.status(200).json({
-                        message: `Дані користувача успішно оновлено`
+                        user
                     });
                 } else {
                     res.status(401).json({
@@ -105,11 +106,6 @@ class User_controller {
                     message: error.message ? error.message : error
                 });
             }
-        } else {
-            res.status(401).json({
-                message: 'Ви не маєте права реєструвати учасників, зверніться до адміністратора сайту.'
-            })
-        }
     }
 
     async getAllUsers(req, res) {
@@ -131,7 +127,7 @@ class User_controller {
 
     async getOneUserById(req, res) {
         try {
-            const user = await User.findOne({
+            const user = await User.scope('userResponse').findOne({
                 where: {
                     id: req.params.id
                 }
