@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 const keys = require('../config/keys');
 const ac = require('../middleware/ac');
 const User = require('../models/User');
-const {response} = require("express");
 
 class User_controller {
 
