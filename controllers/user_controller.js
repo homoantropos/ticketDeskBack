@@ -88,10 +88,11 @@ class User_controller {
                 const passwordsCompare = await bcrypt.compare(req.body.actualPassword, candidate.password);
                 if (passwordsCompare) {
                     const salt = await bcrypt.genSalt(10);
-                    let password = await bcrypt.hash(req.body.password, salt);
+                    let password = await bcrypt.hash(req.body.actualPassword, salt);
+                    if (typeof req.body.password !== undefined) password = await bcrypt.hash(req.body.password, salt);
                     let role = req.body.role;
-                    if(role !== req.user.role)
-                    role = await ac.getRole(role);
+                    if (role !== req.user.role)
+                        role = await ac.getRole(role);
                     if (typeof role === 'string') {
                         await User.update({
                                 email: req.body.email,
