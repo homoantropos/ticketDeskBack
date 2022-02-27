@@ -90,7 +90,9 @@ class User_controller {
                     console.log()
                     const salt = await bcrypt.genSalt(10);
                     let password = await bcrypt.hash(req.body.actualPassword, salt);
-                    if (req.body.password) {password = await bcrypt.hash(req.body.password, salt);}
+                    if (req.body.password) {
+                        password = await bcrypt.hash(req.body.password, salt);
+                    }
                     let role = req.body.role;
                     if (role !== req.user.role)
                         role = await ac.getRole(role);
@@ -176,8 +178,13 @@ class User_controller {
     }
 
     async deleteUser(req, res) {
-        if (req.user.role === 'superAdmin') {
-            try {
+        try {
+            const candidate = await User.findOne({
+                where: {
+                    id: req.params.id
+                }
+            });
+            if (candidate.email === req.user.email || req.user.role === 'superAdmin') {
                 await User.destroy({
                     where: {
                         id: req.params.id
@@ -186,14 +193,14 @@ class User_controller {
                 res.status(201).json({
                     message: `Користувача успішно видалено`
                 });
-            } catch (error) {
-                res.status(500).json({
-                    message: error.message ? error.message : error
+            } else {
+                res.status(401).json({
+                    message: 'Ви не маєте права реєструвати учасників, зверніться до адміністратора сайту.'
                 })
             }
-        } else {
-            res.status(401).json({
-                message: 'Ви не маєте права реєструвати учасників, зверніться до адміністратора сайту.'
+        } catch (error) {
+            res.status(500).json({
+                message: error.message ? error.message : error
             })
         }
     }
