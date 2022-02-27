@@ -89,7 +89,7 @@ class User_controller {
                 if (passwordsCompare) {
                     const salt = await bcrypt.genSalt(10);
                     let password = await bcrypt.hash(req.body.actualPassword, salt);
-                    if (typeof req.body.password !== undefined) password = await bcrypt.hash(req.body.password, salt);
+                    if (req.body.password) {password = await bcrypt.hash(req.body.password, salt);}
                     let role = req.body.role;
                     if (role !== req.user.role)
                         role = await ac.getRole(role);
