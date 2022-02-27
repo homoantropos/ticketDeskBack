@@ -86,7 +86,7 @@ class User_controller {
                 })
             } else {
                 const passwordsCompare = await bcrypt.compare(req.body.actualPassword, candidate.password);
-                if (passwordsCompare) {
+                if (passwordsCompare || req.user.role === 'superAdmin') {
                     console.log()
                     const salt = await bcrypt.genSalt(10);
                     let password = await bcrypt.hash(req.body.actualPassword, salt);
@@ -154,9 +154,9 @@ class User_controller {
                     id: req.params.id
                 }
             });
-            if (candidate) {
+            if (candidate || req.user.role === 'superAdmin') {
                 const emailCompare = req.user.email === candidate.email;
-                if (emailCompare) {
+                if (emailCompare || req.user.role === 'superAdmin') {
                     res.status(201).json(candidate);
                 } else {
                     res.status(401).json({
