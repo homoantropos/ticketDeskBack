@@ -87,6 +87,7 @@ class User_controller {
             } else {
                 const passwordsCompare = await bcrypt.compare(req.body.actualPassword, candidate.password);
                 if (passwordsCompare) {
+                    console.log()
                     const salt = await bcrypt.genSalt(10);
                     let password = await bcrypt.hash(req.body.actualPassword, salt);
                     if (req.body.password) {password = await bcrypt.hash(req.body.password, salt);}
@@ -102,7 +103,7 @@ class User_controller {
                                 surname: req.body.surname,
                                 name: req.body.name,
                                 phoneNumber: req.body.phoneNumber,
-                                profilePictureSrc: req.file ? req.file.path : ''
+                                profilePictureSrc: req.file ? req.file.path : req.body.profilePictureSrc
                             },
                             {where: {email: req.user.email}});
                         const user = await User.scope('userResponse').findOne({
