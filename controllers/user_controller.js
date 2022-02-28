@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const keys = require('../config/keys');
 const ac = require('../middleware/ac');
 const User = require('../models/User');
+const userConfirmationCodeGenerator = require('../utils/userConfirmationCodeGenerator')
 
 class User_controller {
 
@@ -11,6 +12,7 @@ class User_controller {
             const salt = await bcrypt.genSalt(10);
             let password = await bcrypt.hash(req.body.password, salt);
             const role = await ac.getRole(req.body.role);
+            const confirmationCode = await userConfirmationCodeGenerator;
             if (typeof role === 'string') {
                 await User.create({
                     email: req.body.email,
@@ -20,11 +22,14 @@ class User_controller {
                     surname: req.body.surname,
                     name: req.body.name,
                     phoneNumber: req.body.phoneNumber,
-                    profilePictureSrc: req.file ? req.file.path : ''
+                    profilePictureSrc: req.file ? req.file.path : '',
+                    status: 'pending',
+                    confirmationCode
                 });
-                const user = await User.scope('userResponse').findOne({
+                const user = await User.findOne({
                     where: {email: req.body.email}
                 });
+                console.log(user);
                 res.status(201).json(user);
             } else {
                 res.status(401).json({
@@ -48,6 +53,12 @@ class User_controller {
             if (!candidate) {
                 res.status(404).json({
                     message: 'EMAIL_NOT_FOUND'
+                })
+            }
+            if (candidate.status !== 'active') {
+                res.status(401).json({
+                    message: 'Ваш аккаунт не активовано. Перейдіть за посиланням, надісланим на пошту,' +
+                        'указану Вами при реєстрації для активації аккаунту.'
                 })
             } else {
                 const passwordCompare = await bcrypt.compare(req.body.password, candidate.password);

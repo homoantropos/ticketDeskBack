@@ -17,8 +17,8 @@ const User = sequelize.define(
             allowNull: false
         },
         birthday: {
-          type: Sequelize.DATE,
-          allowNull: false
+            type: Sequelize.DATE,
+            allowNull: false
         },
         surname: {
             type: Sequelize.STRING,
@@ -33,16 +33,28 @@ const User = sequelize.define(
             allowNull: false,
             default: 'user'
         },
-        phoneNumber:{
-          type: Sequelize.STRING,
-          allowNull: true
+        phoneNumber: {
+            type: Sequelize.STRING,
+            allowNull: true
         },
         profilePictureSrc: {
             type: Sequelize.STRING,
             allowNull: true
+        },
+        status: {
+            type: Sequelize.STRING,
+            enum: ['pending', 'active'],
+            default: 'pending'
+        },
+        confirmationCode: {
+            type: Sequelize.STRING,
+            allowNull: false,
+            unique: true
+
         }
     })
 
-User.addScope('userResponse', {attributes: {exclude: ['password']}})
+User.addScope('userResponse', {attributes: {exclude: ['password', 'status', 'confirmationCode']}})
+
 module.exports = User
 
