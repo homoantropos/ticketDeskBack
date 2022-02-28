@@ -50,7 +50,11 @@ class User_controller {
                 where: {confirmationCode: req.params.confirmationCode}
             });
             if (user) {
-                user.status = 'active';
+                await User.update({
+                    status: 'active'
+                }, {
+                    where: {confirmationCode: req.params.confirmationCode}
+                })
                 console.log(user.status);
                 res.status(201).json({
                     message: 'Вітаємо! Ваш аккаунт активовано!'
@@ -123,7 +127,6 @@ class User_controller {
             } else {
                 const passwordsCompare = await bcrypt.compare(req.body.actualPassword, candidate.password);
                 if (passwordsCompare || req.user.role === 'superAdmin') {
-                    console.log()
                     const salt = await bcrypt.genSalt(10);
                     let password = await bcrypt.hash(req.body.actualPassword, salt);
                     if (req.body.password) {

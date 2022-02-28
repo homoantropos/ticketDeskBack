@@ -42,9 +42,7 @@ const User = sequelize.define(
             allowNull: true
         },
         status: {
-            type: Sequelize.STRING,
-            enum: ['pending', 'active'],
-            default: 'pending'
+            type: Sequelize.STRING
         },
         confirmationCode: {
             type: Sequelize.STRING,
