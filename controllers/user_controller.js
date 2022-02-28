@@ -13,7 +13,7 @@ class User_controller {
             const salt = await bcrypt.genSalt(10);
             let password = await bcrypt.hash(req.body.password, salt);
             const role = await ac.getRole(req.body.role);
-            const confirmationCode = await userConfirmationCodeGenerator;
+            const confirmationCode = userConfirmationCodeGenerator.confirmationCode();
             if (typeof role === 'string') {
                 await User.create({
                     email: req.body.email,
@@ -55,10 +55,18 @@ class User_controller {
                 }, {
                     where: {confirmationCode: req.params.confirmationCode}
                 })
-                console.log(user.status);
-                res.status(201).json({
-                    message: 'Вітаємо! Ваш аккаунт активовано!'
-                });
+                res.status(201).send(
+                    `<h1
+                        style="
+                               position: absolute;
+                               left: 50%;
+                               transform: translate(-50%);
+                               margin-top: 10px;
+                               font-family: oswald, 'Roboto Thin',sans-serif;
+                               color: green;
+                               "
+                    ><b>Вітаємо! Ваш аккаунт активовано!</b></h1>`
+                );
             } else {
                 res.status(401).json({
                     message: 'Код підтвердження не співпадає'
@@ -83,7 +91,6 @@ class User_controller {
                     message: 'EMAIL_NOT_FOUND'
                 })
             }
-            console.log(candidate.status);
             if (candidate.status !== 'active') {
                 res.status(401).json({
                     message: 'Ваш аккаунт не активовано. Перейдіть за посиланням, надісланим на пошту, ' +
