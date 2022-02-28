@@ -12,7 +12,7 @@ class User_controller {
             const salt = await bcrypt.genSalt(10);
             let password = await bcrypt.hash(req.body.password, salt);
             const role = await ac.getRole(req.body.role);
-            const confirmationCode = await bcrypt.hash(userConfirmationCodeGenerator, salt);
+            const confirmationCode = await userConfirmationCodeGenerator;
             if (typeof role === 'string') {
                 await User.create({
                     email: req.body.email,
@@ -26,7 +26,7 @@ class User_controller {
                     status: 'pending',
                     confirmationCode
                 });
-                const user = await User.findOne({
+                const user = await User.scope('userResponse').findOne({
                     where: {email: req.body.email}
                 });
                 console.log(user);
