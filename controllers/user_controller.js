@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('../utils/nodemailer');
 const keys = require('../config/keys');
 const ac = require('../middleware/ac');
 const User = require('../models/User');
@@ -29,11 +30,34 @@ class User_controller {
                 const user = await User.scope('userResponse').findOne({
                     where: {email: req.body.email}
                 });
-                console.log(user);
+                nodemailer.sendConfirmationEmail(user.name, user.email, confirmationCode);
                 res.status(201).json(user);
             } else {
                 res.status(401).json({
                     message: role.message ? role.message : role
+                });
+            }
+        } catch (error) {
+            res.status(500).json({
+                message: error.message ? error.message : error
+            })
+        }
+    }
+
+    async confirmUser(req, res) {
+        try {
+            const user = await User.findOne({
+                where: {confirmationCode: req.params.confirmationCode}
+            });
+            if (user) {
+                user.status = 'active';
+                console.log(user.status);
+                res.status(201).json({
+                    message: 'Вітаємо! Ваш аккаунт активовано!'
+                });
+            } else {
+                res.status(401).json({
+                    message: 'Код підтвердження не співпадає'
                 });
             }
         } catch (error) {
@@ -55,9 +79,10 @@ class User_controller {
                     message: 'EMAIL_NOT_FOUND'
                 })
             }
+            console.log(candidate.status);
             if (candidate.status !== 'active') {
                 res.status(401).json({
-                    message: 'Ваш аккаунт не активовано. Перейдіть за посиланням, надісланим на пошту,' +
+                    message: 'Ваш аккаунт не активовано. Перейдіть за посиланням, надісланим на пошту, ' +
                         'указану Вами при реєстрації для активації аккаунту.'
                 })
             } else {
