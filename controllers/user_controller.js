@@ -12,7 +12,7 @@ class User_controller {
             const salt = await bcrypt.genSalt(10);
             let password = await bcrypt.hash(req.body.password, salt);
             const role = await ac.getRole(req.body.role);
-            const confirmationCode = await userConfirmationCodeGenerator;
+            const confirmationCode = await bcrypt.hash(userConfirmationCodeGenerator, salt);
             if (typeof role === 'string') {
                 await User.create({
                     email: req.body.email,
