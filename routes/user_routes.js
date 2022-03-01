@@ -6,6 +6,7 @@ const upload = require('../middleware/upload')
 
 router.post('/register', upload.single('image'), controller.registerUser);
 router.get('/confirm/:confirmationCode', controller.confirmUser);
+router.post('/reset', controller.resetPassword);
 router.patch('/:id', passport.authenticate('jwt', {session: false}), upload.single('image'), controller.updateUser);
 router.post('/login', controller.login);
 router.get('/role', passport.authenticate('jwt', {session: false}, controller.getRole));

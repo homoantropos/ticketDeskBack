@@ -120,6 +120,25 @@ class User_controller {
         }
     }
 
+    async resetPassword(req, res) {
+        try {
+            console.log(req.body);
+            const candidate = await User.findOne({
+                where: {email: req.body.email}
+            })
+            if (candidate) {
+                console.log(candidate.email);
+            }
+            res.status(200).json({
+                message: 'На емейл, указаний під час реєстрації, надіслано інструкції щодо відновлення паролю'
+            })
+        } catch (error) {
+            res.status(500).json({
+                message: error.message ? error.message : error
+            })
+        }
+    }
+
     async updateUser(req, res) {
         try {
             const candidate = await User.findOne({
