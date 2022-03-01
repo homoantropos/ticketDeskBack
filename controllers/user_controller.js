@@ -6,15 +6,9 @@ const keys = require('../config/keys');
 const ac = require('../middleware/ac');
 const User = require('../models/User');
 const userConfirmationCodeGenerator = require('../utils/userConfirmationCodeGenerator')
-const UserConfirmationCodeProvider = require('../utils/userConfirmationCodeGenerator')
+const UserConfirmationCodeProvider = require('../utils/confirmationCodeProvider')
 
 class User_controller {
-
-    _userConfirmationCode = 'code';
-
-    get userConfirmationCode () {
-        return this._userConfirmationCode;
-    }
 
     async registerUser(req, res) {
         try {
