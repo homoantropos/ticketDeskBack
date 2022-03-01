@@ -23,3 +23,15 @@ module.exports.sendConfirmationEmail = (name, email, confirmationCode) => {
                 <a href=http://localhost:8050/api/user/confirm/${confirmationCode}>натисніть тут</a>`
     })
 }
+
+module.exports.sendLinkForPasswordReset = (name, email, confirmationCode) => {
+    transport.sendMail({
+        from: user,
+        to: email,
+        subject: "Внесіть новий пароль",
+        html: `<h1>Активація акаунту</h1>
+                <h2>вітаємо, ${name}!</h2>
+                <p>Дякуємо за реєстрацію на сайті! Дя активації вашого акаунту просимо перейти за наступним посиланням:</p>
+                <a href=http://localhost:8050/api/user/confirm/${confirmationCode}>натисніть тут</a>`
+    })
+}

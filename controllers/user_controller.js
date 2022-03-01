@@ -178,6 +178,27 @@ class User_controller {
         }
     }
 
+    async resetPassword(req, res) {
+        try {
+            const candidate = await User.findOne({
+                where: {email: req.body.email}
+            })
+            if(!candidate) {
+                res.status(401).json({
+                    message: 'Такого користувача не існує. Перевірте адресу електронної пошти'
+                })
+            } else {
+                nodemailer.sendLinkForPasswordReset(candidate.name, candidate.email, candidate.confirmationCode);
+                res.status(201).json({
+                    message: 'Лист з інструкціями по відновленню пароля надіслано на вашу електронну пошту.'
+                })
+            }
+        } catch (error) {
+            res.status(500).json({
+                message: error.message ? error.message : error
+            })
+        }
+    }
     async getAllUsers(req, res) {
         if (req.user.role === 'superAdmin') {
             try {
