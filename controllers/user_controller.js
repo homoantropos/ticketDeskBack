@@ -1,3 +1,4 @@
+const path = require('path');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('../utils/nodemailer');
@@ -5,8 +6,15 @@ const keys = require('../config/keys');
 const ac = require('../middleware/ac');
 const User = require('../models/User');
 const userConfirmationCodeGenerator = require('../utils/userConfirmationCodeGenerator')
+const UserConfirmationCodeProvider = require('../utils/userConfirmationCodeGenerator')
 
 class User_controller {
+
+    _userConfirmationCode = 'code';
+
+    get userConfirmationCode () {
+        return this._userConfirmationCode;
+    }
 
     async registerUser(req, res) {
         try {
@@ -178,12 +186,12 @@ class User_controller {
         }
     }
 
-    async resetPassword(req, res) {
+    async sentLinkToResetPassword(req, res) {
         try {
             const candidate = await User.findOne({
                 where: {email: req.body.email}
             })
-            if(!candidate) {
+            if (!candidate) {
                 res.status(401).json({
                     message: 'Такого користувача не існує. Перевірте адресу електронної пошти'
                 })
@@ -199,6 +207,59 @@ class User_controller {
             })
         }
     }
+
+    sentFormForPasswordReset(req, res) {
+        try {
+            let code = req.url.toString();
+            code = code.replace('/reset/', '');
+            UserConfirmationCodeProvider._userConfirmationCode = code.slice();
+            const filePath = path.resolve('views', 'password_reset_form.html');
+            res.status(200).sendFile(filePath);
+        } catch (error) {
+            res.status(500).json({
+                message: error.message ? error.message : error
+            })
+        }
+    }
+
+    async resetPassword(req, res) {
+        try {
+            const salt = await bcrypt.genSalt(10);
+            const password = await bcrypt.hash(req.query.password, salt);
+            console.log(UserConfirmationCodeProvider._userConfirmationCode);
+            const candidate = await User.findOne({
+                where: {confirmationCode: UserConfirmationCodeProvider._userConfirmationCode}
+            })
+            if (!candidate) {
+                res.status(401).json({
+                    message: 'Такого користувача не знайдено!'
+                })
+            }
+            await User.update({
+                password
+            }, {
+                where: {confirmationCode: UserConfirmationCodeProvider._userConfirmationCode}
+            });
+            res.status(201).send(
+                `<h1
+                        style="
+                               position: absolute;
+                               left: 50%;
+                               transform: translate(-50%);
+                               margin-top: 10px;
+                               font-family: oswald, 'Roboto Thin',sans-serif;
+                               color: green;
+                               "
+                    ><b>Вітаємо! Ваш пароль змінено!</b></h1>`
+            );
+
+        } catch (error) {
+            res.status(500).json({
+                message: error.message ? error.message : error
+            })
+        }
+    }
+
     async getAllUsers(req, res) {
         if (req.user.role === 'superAdmin') {
             try {
