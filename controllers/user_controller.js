@@ -155,10 +155,13 @@ class User_controller {
                                 phoneNumber: req.body.phoneNumber,
                                 profilePictureSrc: req.file ? req.file.path : req.body.profilePictureSrc
                             },
-                            {where: {email: req.user.email}});
+                            {where: {email: req.body.email}});
                         const user = await User.scope('userResponse').findOne({
-                            where: {email: req.body.email}
+                            where: {email: candidate.email}
                         });
+                        if(req.user.role === 'superAdmin'){
+                            user.id = candidate.id;
+                        }
                         res.status(200).json({
                             user
                         });
