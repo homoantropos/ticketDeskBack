@@ -218,24 +218,25 @@ class User_controller {
 
     async resetPassword(req, res) {
         try {
-            const salt = await bcrypt.genSalt(10);
-            const password = await bcrypt.hash(req.query.password, salt);
-            console.log(UserConfirmationCodeProvider._userConfirmationCode);
             const candidate = await User.findOne({
                 where: {confirmationCode: UserConfirmationCodeProvider._userConfirmationCode}
             })
             if (!candidate) {
                 res.status(401).json({
-                    message: 'Такого користувача не знайдено!'
+                    message: 'Ви вже користувалися цим посиланням або такого користувача не існує! Будь ласка повторіть спробу'
                 })
-            }
-            await User.update({
-                password
-            }, {
-                where: {confirmationCode: UserConfirmationCodeProvider._userConfirmationCode}
-            });
-            res.status(201).send(
-                `<h1
+            } else {
+                const salt = await bcrypt.genSalt(10);
+                const password = await bcrypt.hash(req.query.password.trim(), salt);
+                const confirmationCode = userConfirmationCodeGenerator.confirmationCode();
+                await User.update({
+                    password,
+                    confirmationCode
+                }, {
+                    where: {email: candidate.email}
+                });
+                res.status(201).send(
+                    `<h1
                         style="
                                position: absolute;
                                left: 50%;
@@ -245,8 +246,8 @@ class User_controller {
                                color: green;
                                "
                     ><b>Вітаємо! Ваш пароль змінено!</b></h1>`
-            );
-
+                );
+            }
         } catch (error) {
             res.status(500).json({
                 message: error.message ? error.message : error
