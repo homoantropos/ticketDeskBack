@@ -244,7 +244,7 @@ class User_controller {
                                font-family: oswald, 'Roboto Thin',sans-serif;
                                color: green;
                                "
-                    ><b>Вітаємо! Ваш пароль змінено!</b></h1>`
+                    ><b>Вітаємо! Ваш пароль змінено! Ви можете повернутися на сайт і повторити спробу увійти!</b></h1>`
                 );
             }
         } catch (error) {
