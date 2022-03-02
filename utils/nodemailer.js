@@ -18,7 +18,7 @@ module.exports.sendConfirmationEmail = (name, email, confirmationCode) => {
         to: email,
         subject: "Просимо активувати ваш акаунт за посиланням",
         html: `<h1>Активація акаунту</h1>
-                <h2>вітаємо, ${name}!</h2>
+                <h2>Вітаємо!</h2>
                 <p>Дякуємо за реєстрацію на сайті! Дя активації вашого акаунту просимо перейти за наступним посиланням:</p>
                 <a href=http://localhost:8050/api/user/confirm/${confirmationCode}>натисніть тут</a>`
     })
@@ -29,8 +29,7 @@ module.exports.sendLinkForPasswordReset = (name, email, confirmationCode) => {
         from: user,
         to: email,
         subject: "Внесіть новий пароль",
-        html: `<h1>Активація акаунту</h1>
-                <h2>вітаємо, ${name}!</h2>
+        html: `<h1>Зміна пароля</h1>
                 <p>Для зміни паролю просимо перейти за наступним посиланням:</p>
                 <a href=http://localhost:8050/api/user/reset/${confirmationCode}>натисніть тут</a>`
     })

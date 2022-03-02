@@ -222,9 +222,8 @@ class User_controller {
                 where: {confirmationCode: UserConfirmationCodeProvider._userConfirmationCode}
             })
             if (!candidate) {
-                res.status(401).json({
-                    message: 'Ви вже користувалися цим посиланням або такого користувача не існує! Будь ласка повторіть спробу'
-                })
+                const warningPath = path.resolve('views', 'invalid_confirmationCode_warning.html');
+                res.status(401).sendFile(warningPath);
             } else {
                 const salt = await bcrypt.genSalt(10);
                 const password = await bcrypt.hash(req.query.password.trim(), salt);
