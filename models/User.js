@@ -50,9 +50,13 @@ const User = sequelize.define(
             unique: true
 
         }
+    }, {
+        freezeTableName: true,
+        timestamps: false
     })
 
-User.addScope('userResponse', {attributes: {exclude: ['password', 'status', 'confirmationCode']}})
+User.addScope('userResponse', {attributes: {exclude: ['password', 'status', 'confirmationCode']}});
+User.addScope('adminResponse', {attributes: {exclude: ['password']}});
 
 module.exports = User
 

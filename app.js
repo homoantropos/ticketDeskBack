@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 app.use(require('cors')());
 
 app.use('/api/user', userRoutes);
-app.use('/api/section', auditoriumSectionRoutes)
+app.use('/api/section', auditoriumSectionRoutes);
 
 sequelize.sync({alter: true})
     .then(
