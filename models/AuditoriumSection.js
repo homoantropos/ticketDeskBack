@@ -8,7 +8,7 @@ const AuditoriumSection = sequelize.define(
             type: Sequelize.STRING,
             allowNull: false,
             unique: true
-        }
+        },
     }, {
         freezeTableName: true,
         timestamps: false
