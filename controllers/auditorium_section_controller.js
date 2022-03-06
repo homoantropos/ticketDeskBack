@@ -124,7 +124,6 @@ class AuditoriumSection_controller {
         if (accessAllowed) {
             try {
                 const sections = await AuditoriumSection.findAll();
-                console.log(sections);
                 let sectionNames = []
                 Object.keys(sections).map(
                     key => sectionNames.push(sections[key].sectionName)
