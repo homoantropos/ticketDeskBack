@@ -7,10 +7,17 @@ const Seat = sequelize.define(
     'seat', {
         row: {
             type: Sequelize.INTEGER,
+            allowNull: true,
             unique: 'seat'
         },
-        placeNumber: {
+        seatNumber: {
             type: Sequelize.INTEGER,
+            allowNull: true,
+            unique: 'seat'
+        },
+        auditoriumSectionId: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
             unique: 'seat'
         }
     }, {
@@ -30,16 +37,15 @@ AuditoriumSection.hasMany(Seat, {
 });
 
 Seat.addScope('place', {
-    attributes: {
-        includes: [
-            {
-                model: AuditoriumSection,
-                attributes: {
-                    exclude: ['id', 'freezeTableName']
-                }
+    attributes: {exclude: ['auditoriumSectionId']},
+    include: [
+        {
+            model: AuditoriumSection,
+            attributes: {
+                exclude: ['id']
             }
-        ]
-    }
+        }
+    ]
 })
 
 module.exports = Seat
