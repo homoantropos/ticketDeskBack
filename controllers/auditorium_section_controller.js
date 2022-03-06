@@ -119,6 +119,29 @@ class AuditoriumSection_controller {
         }
     }
 
+    async getSectionNames(req, res) {
+        const accessAllowed = await auth.allowAccess(req, 'superAdmin');
+        if (accessAllowed) {
+            try {
+                const sections = await AuditoriumSection.findAll();
+                console.log(sections);
+                let sectionNames = []
+                Object.keys(sections).map(
+                    key => sectionNames.push(sections[key].sectionName)
+                );
+                res.status(200).json(sectionNames);
+            } catch (error) {
+                res.status(500).json({
+                    message: error.message ? error.message : error
+                })
+            }
+        } else {
+            res.status(401).json({
+                message: 'відсутні необіхдні права доступу'
+            })
+        }
+
+    }
 }
 
 module.exports = new AuditoriumSection_controller()
