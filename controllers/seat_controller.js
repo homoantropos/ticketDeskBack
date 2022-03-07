@@ -92,25 +92,25 @@ class Seat_controller {
         if (accessAllowed) {
             try {
                 const promises = req.body.ids.map(
-                  async id => {
-                      const candidate = await Seat.findOne({
-                          where: {id}
-                      });
-                      if (candidate) {
-                          await Seat.destroy({
-                              where: {id}
-                          });
-                          return {
-                              id,
-                              message: 'Дані успішно видалено'
-                          }
-                      } else {
-                          return {
-                              id,
-                              message: 'Такої частини глядацького залу не знайдено'
-                          }
-                      }
-                  }
+                    async id => {
+                        const candidate = await Seat.findOne({
+                            where: {id}
+                        });
+                        if (candidate) {
+                            await Seat.destroy({
+                                where: {id}
+                            });
+                            return {
+                                id,
+                                message: 'Дані успішно видалено'
+                            }
+                        } else {
+                            return {
+                                id,
+                                message: 'Такої частини глядацького залу не знайдено'
+                            }
+                        }
+                    }
                 );
                 const results = await Promise.all(promises);
                 res.status(200).json(
