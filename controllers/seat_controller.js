@@ -154,7 +154,18 @@ class Seat_controller {
         const accessAllowed = await auth.allowAccess(req, 'superAdmin');
         if (accessAllowed) {
             try {
-                const seats = await Seat.scope('place').findAll();
+                let seats = await Seat.scope('place').findAll();
+                if (req.query.sectionName) {
+                   seats =  seats.filter(seat => seat.auditoriumSection.sectionName === req.query.sectionName)
+                }
+                if (req.query.row) {
+                    const row = +req.query.row;
+                    seats =  seats.filter(seat => seat.row === row)
+                }
+                if (req.query.seatNumber) {
+                    const seatNumber = +req.query.seatNumber;
+                    seats = seats.filter(seat => seat.seatNumber === seatNumber)
+                }
                 res.status(200).json(seats);
             } catch (error) {
                 res.status(500).json({
