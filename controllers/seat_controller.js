@@ -8,11 +8,11 @@ class Seat_controller {
         const accessAllowed = await auth.allowAccess(req, 'superAdmin');
         if (accessAllowed) {
             try {
-                const promises = req.body.seats.map(
+                const promises = req.body.map(
                     async seat => {
                         const section = await Auditorium_section.findOne({
                             where: {
-                                sectionName: seat.sectionName
+                                sectionName: seat.auditoriumSection.sectionName
                             }
                         });
                         const createdSeat = await Seat.scope('place').findOrCreate({
