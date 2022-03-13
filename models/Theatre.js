@@ -34,9 +34,13 @@ Theatre.hasMany(Seat);
 Seat.belongsToMany(Theatre, {as: 'Seats', through: 'TheatreSeats'});
 
 Theatre.addScope('theatre', {
-    attributes: {},
-    includes: [
-        {model: Seat}
+    attributes: {exclude: ['seatId']},
+    include: [
+        {model: Seat,
+            attributes: {
+                exclude: ['id']
+            }
+        },
     ]
 })
 

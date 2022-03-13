@@ -1,5 +1,5 @@
 const Seat = require('../models/Seat');
-const Auditorium_section = require('../models/AuditoriumSection')
+const Auditorium_section = require('../models/AuditoriumSection');
 const auth = require('../database/auth');
 
 class Seat_controller {

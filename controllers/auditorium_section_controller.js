@@ -114,7 +114,7 @@ class AuditoriumSection_controller {
             }
         } else {
             res.status(401).json({
-                message: 'відсутні необіхдні права доступу'
+                message: 'відсутні необхідні права доступу'
             })
         }
     }
