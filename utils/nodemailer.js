@@ -5,7 +5,9 @@ const user = keys.user;
 const pass = keys.pass
 
 const transport = nodemailer.createTransport({
-    service: 'Gmail',
+    host: "smtp.ukr.net",
+    port: 465,
+    secure: true,
     auth: {
         user: user,
         pass: pass
