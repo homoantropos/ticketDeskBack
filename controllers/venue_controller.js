@@ -81,7 +81,15 @@ class Venue_controller {
         const accessAllowed = await auth.allowAccess(req, 'superAdmin');
         if (accessAllowed) {
             try {
-
+                await Venue.destroy({
+                    where: {
+                        id: req.params.id
+                    }
+                });
+                res.status(201).json({
+                    venueId: req.params.id,
+                    message: 'Дані успішно видалено'
+                });
             } catch (error) {
                 res.status(500).json({
                     message: error.message ? error.message : error
@@ -96,6 +104,18 @@ class Venue_controller {
 
     async getVenueById(req, res) {
         try {
+            const venue = await Venue.scope('venue').findOne({
+                where: {
+                    id: req.params.id
+                }
+            })
+            if(venue) {
+                res.status(201).json(venue);
+            } else {
+                res.status(401).json({
+                    message: `Місця проведення з id ${req.params.id} в базі даних не знайдено`
+                })
+            }
 
         } catch (error) {
             res.status(500).json({
