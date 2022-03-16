@@ -1,5 +1,5 @@
 const Seat = require('../models/Seat');
-const Auditorium_section = require('../models/AuditoriumSection');
+const Venue = require('../models/Venue');
 const auth = require('../database/auth');
 
 class Seat_controller {
@@ -8,28 +8,46 @@ class Seat_controller {
         const accessAllowed = await auth.allowAccess(req, 'superAdmin');
         if (accessAllowed) {
             try {
-                const promises = req.body.map(
-                    async seat => {
-                        const section = await Auditorium_section.findOne({
-                            where: {
-                                sectionName: seat.auditoriumSection.sectionName
-                            }
-                        });
-                        const createdSeat = await Seat.scope('place').findOrCreate({
-                            where: {
-                                row: seat.row,
-                                seatNumber: seat.seatNumber,
-                                auditoriumSectionId: section.id
-                            }
-                        });
-                        return createdSeat[0];
+                const venue = await Venue.findOne({
+                    where: {
+                        name: req.body.venue.name,
+                        address: req.body.venue.address
                     }
-                );
-                const seats = await Promise.all(promises);
-                res.status(200).json({
-                    seats,
-                    message: `Дані успішно збережено!`
                 });
+                if (venue) {
+                    const promises = req.body.seats.map(
+                        async seat => {
+                            let createdSeat = await Seat.findOne({
+                                where: {
+                                    venueHall: seat.venueHall ? seat.venueHall : '',
+                                    hallSection: seat.hallSection ? seat.hallSection : '',
+                                    row: seat.row ? seat.row : null,
+                                    seatNumber: seat.seatNumber ? seat.seatNumber : null,
+                                }
+                            });
+                            if (!createdSeat) {
+                                createdSeat = await venue.createSeat({
+                                        venueHall: seat.venueHall ? seat.venueHall : '',
+                                        hallSection: seat.hallSection ? seat.hallSection : '',
+                                        row: seat.row ? seat.row : null,
+                                        seatNumber: seat.seatNumber ? seat.seatNumber : null,
+                                        typeOfSeat: seat.typeOfSeat ? seat.typeOfSeat : 'regular'
+                                    }
+                                );
+                            }
+                            return createdSeat;
+                        }
+                    );
+                    const seats = await Promise.all(promises);
+                    res.status(200).json({
+                        seats,
+                        message: `Дані успішно збережено!`
+                    });
+                } else {
+                    res.status(401).json({
+                        message: `${req.body.venue.name} з адресою ${req.body.venue.address} в базі даних не знайдено`
+                    })
+                }
             } catch (error) {
                 res.status(500).json({
                     message: error.message ? error.message : error
@@ -48,24 +66,27 @@ class Seat_controller {
             try {
                 const promises = req.body.seats.map(
                     async seat => {
-                        const candidate = await Seat.scope('place').findOne({
+                        const candidate = await Seat.findOne({
                             where: {id: seat.id}
                         });
                         if (candidate) {
                             await Seat.update({
-                                row: seat.row,
-                                seatNumber: seat.seatNumber
+                                venueHall: seat.venueHall ? seat.venueHall : '',
+                                hallSection: seat.hallSection ? seat.hallSection : '',
+                                row: seat.row ? seat.row : null,
+                                seatNumber: seat.seatNumber ? seat.seatNumber : null,
+                                typeOfSeat: seat.typeOfSeat ? seat.typeOfSeat : 'regular'
                             }, {
                                 where: {
                                     id: seat.id
                                 }
                             });
-                            return await Seat.scope('place').findOne({
+                            return await Seat.findOne({
                                 where: {id: candidate.id}
                             });
                         } else {
                             res.status(401).json({
-                                message: 'Такої частини глядацького залу не знайдено'
+                                message: 'місць з такими умовами не знайдено'
                             })
                         }
                     }
@@ -128,54 +149,67 @@ class Seat_controller {
     }
 
     async getSeatById(req, res) {
-        const accessAllowed = await auth.allowAccess(req, 'superAdmin');
-        if (accessAllowed) {
-            try {
-                const seat = await Seat.scope('place').findOne({
+        try {
+            const venue = await Venue.findOne({
+                where: {id: req.query.venueId}
+            });
+            if (venue) {
+                const seat = await Seat.findOne({
                     where: {
                         id: req.params.id
                     }
                 })
                 res.status(200).json(seat);
-            } catch (error) {
-                res.status(500).json({
-                    message: error.message ? error.message : error
+            } else {
+                res.status(401).json({
+                    message: `Місця проведення з id: ${req.query.venueId} в базі даних не знайдено`
                 })
             }
-
-        } else {
-            res.status(401).json({
-                message: 'відсутні необіхдні права доступу'
+        } catch (error) {
+            res.status(500).json({
+                message: error.message ? error.message : error
             })
         }
     }
 
     async getAllSeats(req, res) {
-        const accessAllowed = await auth.allowAccess(req, 'superAdmin');
-        if (accessAllowed) {
-            try {
-                let seats = await Seat.scope('place').findAll();
-                if (req.query.sectionName) {
-                   seats =  seats.filter(seat => seat.auditoriumSection.sectionName === req.query.sectionName)
+        try {
+            const venue = await Venue.findOne({
+                where: {id: req.query.venueId}
+            })
+            if (venue) {
+                let seats = await Seat.findAll({
+                    where: {
+                        venueId: venue.id
+                    }
+                });
+                if (req.query.venueHall) {
+                    seats = seats.filter(seat => seat.venueHall === req.query.venueHall)
+                }
+                if (req.query.hallSection) {
+                    seats = seats.filter(seat => seat.hallSection === req.query.hallSection)
                 }
                 if (req.query.row) {
                     const row = +req.query.row;
-                    seats =  seats.filter(seat => seat.row === row)
+                    seats = seats.filter(seat => seat.row === row)
                 }
                 if (req.query.seatNumber) {
                     const seatNumber = +req.query.seatNumber;
                     seats = seats.filter(seat => seat.seatNumber === seatNumber)
                 }
+                if (req.query.typeOfSeat) {
+                    seats = seats.filter(seat => seat.typeOfSeat === req.query.typeOfSeat)
+                }
                 res.status(200).json(seats);
-            } catch (error) {
-                res.status(500).json({
-                    message: error.message ? error.message : error
+            } else {
+                res.status(401).json({
+                    message: `Місця проведення з id: ${req.query.venueId} в базі даних не знайдено`
                 })
             }
 
-        } else {
-            res.status(401).json({
-                message: 'відсутні необіхдні права доступу'
+        } catch (error) {
+            res.status(500).json({
+                message: error.message ? error.message : error
             })
         }
     }

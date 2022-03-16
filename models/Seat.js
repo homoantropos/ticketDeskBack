@@ -1,10 +1,18 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../database/sequelize');
 
-const AuditoriumSection = require('../models/AuditoriumSection')
-
 const Seat = sequelize.define(
     'seat', {
+        venueHall: {
+            type: Sequelize.STRING,
+            allowNull: true,
+            unique: 'seat'
+        },
+        hallSection: {
+            type: Sequelize.STRING,
+            allowNull: true,
+            unique: 'seat'
+        },
         row: {
             type: Sequelize.INTEGER,
             allowNull: true,
@@ -15,37 +23,15 @@ const Seat = sequelize.define(
             allowNull: true,
             unique: 'seat'
         },
-        auditoriumSectionId: {
-            type: Sequelize.INTEGER,
+        typeOfSeat: {
+            type: Sequelize.STRING,
             allowNull: false,
-            unique: 'seat'
+            default: 'regular'
         }
     }, {
         freezeTableName: true,
         timestamps: false
     }
 )
-
-Seat.belongsTo(AuditoriumSection, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-});
-
-AuditoriumSection.hasMany(Seat, {
-    onDelete: 'NO ACTION',
-    onUpdate: 'CASCADE'
-});
-
-Seat.addScope('place', {
-    attributes: {exclude: ['auditoriumSectionId']},
-    include: [
-        {
-            model: AuditoriumSection,
-            attributes: {
-                exclude: ['id']
-            }
-        }
-    ]
-})
 
 module.exports = Seat
