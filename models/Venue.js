@@ -33,11 +33,14 @@ const Venue = sequelize.define('venue', {
 
 Venue.addScope(
     'venue', {
-        attributes: {
-            exclude: [
-                'id', 'seatId'
-            ]
-        }
+        include: [
+            {
+                model: Seat, as: 'seats',
+                // include: [
+                //     'venueHall', 'hallSection', 'row', 'seatNumber', 'typeOfSeat'
+                // ]
+            }
+        ]
     }
 )
 
@@ -45,6 +48,14 @@ Venue.hasMany(Seat, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
 });
+
+Venue.belongsToMany(Seat,
+    {
+        as: 'venue',
+        through: 'VenueSeats',
+        onDelete: 'NO ACTION',
+        onUpdate: 'NO ACTION'
+    });
 
 Seat.belongsToMany(
     Venue,
