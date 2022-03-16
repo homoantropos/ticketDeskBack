@@ -10,7 +10,10 @@ class Venue_controller {
                 const venue = await Venue.findOrCreate({
                     where: {
                         name: req.body.name,
-                        address: req.body.address,
+                        country: req.body.country,
+                        town: req.body.town,
+                        street: req.body.street,
+                        building: req.body.building,
                         phones: req.body.phones ? req.body.phones : [],
                         email: req.body.email ? req.body.email : '',
                         webSite: req.body.webSite ? req.body.webSite : ''
@@ -37,20 +40,21 @@ class Venue_controller {
             try {
                 await Venue.update({
                     name: req.body.name,
-                    address: req.body.address,
+                    country: req.body.country,
+                    town: req.body.town,
+                    street: req.body.street,
+                    building: req.body.building,
                     phones: req.body.phones ? req.body.phones : [],
                     email: req.body.email ? req.body.email : '',
                     webSite: req.body.webSite ? req.body.webSite : ''
                 }, {
                     where: {
-                        name: req.body.name,
-                        address: req.body.address
+                        id: req.params.id
                     }
                 });
                 const venue = await Venue.findOne({
                     where: {
-                        name: req.body.name,
-                        address: req.body.address
+                        id: req.params.id
                     }
                 })
                 if (req.body.seats) {
