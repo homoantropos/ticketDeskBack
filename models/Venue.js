@@ -35,10 +35,7 @@ Venue.addScope(
     'venue', {
         include: [
             {
-                model: Seat, as: 'seats',
-                // include: [
-                //     'venueHall', 'hallSection', 'row', 'seatNumber', 'typeOfSeat'
-                // ]
+                model: Seat, as: 'seats'
             }
         ]
     }
