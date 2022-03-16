@@ -59,8 +59,7 @@ class Venue_controller {
                             await venue.addSeat([seat.id, venue.id]);
                         }
                     );
-                    const result = Promise.all(promises);
-                    console.log(result);
+                    await Promise.all(promises);
                 }
                 res.status(201).json({
                     venue,
