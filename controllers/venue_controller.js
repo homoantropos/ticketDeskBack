@@ -1,5 +1,6 @@
 const auth = require("../database/auth");
 const Venue = require('../models/Venue');
+const Seat = require('../models/Seat')
 
 class Venue_controller {
 
@@ -18,7 +19,25 @@ class Venue_controller {
                         email: req.body.email ? req.body.email : '',
                         webSite: req.body.webSite ? req.body.webSite : ''
                     }
-                })
+                });
+                if (req.body.seats) {
+                    const promises = req.body.seats.map (
+                        async seat => {
+                            const createdSeat = await Seat.findOrCreate({
+                                where: {
+                                    venueHall: seat.venueHall ? seat.venueHall : '',
+                                    hallSection: seat.hallSection ? seat.hallSection : '',
+                                    row: seat.row ? seat.row : null,
+                                    seatNumber: seat.seatNumber ? seat.seatNumber : null,
+                                    typeOfSeat: seat.typeOfSeat ? seat.typeOfSeat : 'regular'
+                                }
+                            })
+                            return await venue[0].addSeat(createdSeat[0]);
+                        }
+                    );
+                    const results = await Promise.all(promises);
+                    venue[0].seats = results.slice();
+                }
                 res.status(200).json(
                     venue[0]
                 )
@@ -52,18 +71,26 @@ class Venue_controller {
                         id: req.params.id
                     }
                 });
-                const venue = await Venue.findOne({
+                const venue = await Venue.scope('venue').findOne({
                     where: {
                         id: req.params.id
                     }
-                })
+                });
                 if (req.body.seats) {
                     const promises = req.body.seats.map (
                         async seat => {
-                            await venue.addSeat([seat.id, venue.id]);
+                            const createdSeat = await Seat.create({
+                                venueHall: seat.venueHall ? seat.venueHall : '',
+                                hallSection: seat.hallSection ? seat.hallSection : '',
+                                row: seat.row ? seat.row : null,
+                                seatNumber: seat.seatNumber ? seat.seatNumber : null,
+                                typeOfSeat: seat.typeOfSeat ? seat.typeOfSeat : 'regular'
+                            })
+                            return await venue.addSeat(createdSeat);
                         }
                     );
-                    await Promise.all(promises);
+                    const results = await Promise.all(promises);
+                    venue.seats = results.slice();
                 }
                 res.status(201).json({
                     venue,

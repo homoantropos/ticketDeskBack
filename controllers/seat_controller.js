@@ -174,32 +174,28 @@ class Seat_controller {
 
     async getAllSeats(req, res) {
         try {
-            const venue = await Venue.findOne({
+            const venue = await Venue.scope('venue').findOne({
                 where: {id: req.query.venueId}
             })
             if (venue) {
-                let seats = await Seat.findAll({
-                    where: {
-                        venueId: venue.id
-                    }
-                });
-                if (req.query.venueHall) {
-                    seats = seats.filter(seat => seat.venueHall === req.query.venueHall)
-                }
-                if (req.query.hallSection) {
-                    seats = seats.filter(seat => seat.hallSection === req.query.hallSection)
-                }
-                if (req.query.row) {
-                    const row = +req.query.row;
-                    seats = seats.filter(seat => seat.row === row)
-                }
-                if (req.query.seatNumber) {
-                    const seatNumber = +req.query.seatNumber;
-                    seats = seats.filter(seat => seat.seatNumber === seatNumber)
-                }
-                if (req.query.typeOfSeat) {
-                    seats = seats.filter(seat => seat.typeOfSeat === req.query.typeOfSeat)
-                }
+                let seats = await Seat.findAll();
+                // if (req.query.venueHall) {
+                //     seats = seats.filter(seat => seat.venueHall === req.query.venueHall)
+                // }
+                // if (req.query.hallSection) {
+                //     seats = seats.filter(seat => seat.hallSection === req.query.hallSection)
+                // }
+                // if (req.query.row) {
+                //     const row = +req.query.row;
+                //     seats = seats.filter(seat => seat.row === row)
+                // }
+                // if (req.query.seatNumber) {
+                //     const seatNumber = +req.query.seatNumber;
+                //     seats = seats.filter(seat => seat.seatNumber === seatNumber)
+                // }
+                // if (req.query.typeOfSeat) {
+                //     seats = seats.filter(seat => seat.typeOfSeat === req.query.typeOfSeat)
+                // }
                 res.status(200).json(seats);
             } else {
                 res.status(401).json({
