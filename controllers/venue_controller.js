@@ -79,14 +79,16 @@ class Venue_controller {
                 if (req.body.seats) {
                     const promises = req.body.seats.map (
                         async seat => {
-                            const createdSeat = await Seat.create({
-                                venueHall: seat.venueHall ? seat.venueHall : '',
-                                hallSection: seat.hallSection ? seat.hallSection : '',
-                                row: seat.row ? seat.row : null,
-                                seatNumber: seat.seatNumber ? seat.seatNumber : null,
-                                typeOfSeat: seat.typeOfSeat ? seat.typeOfSeat : 'regular'
+                            const createdSeat = await Seat.findOrCreate({
+                                where: {
+                                    venueHall: seat.venueHall ? seat.venueHall : '',
+                                    hallSection: seat.hallSection ? seat.hallSection : '',
+                                    row: seat.row ? seat.row : null,
+                                    seatNumber: seat.seatNumber ? seat.seatNumber : null,
+                                    typeOfSeat: seat.typeOfSeat ? seat.typeOfSeat : 'regular'
+                                }
                             })
-                            return await venue.addSeat(createdSeat);
+                            return await venue.addSeat(createdSeat[0]);
                         }
                     );
                     const results = await Promise.all(promises);
