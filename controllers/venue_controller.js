@@ -21,7 +21,7 @@ class Venue_controller {
                     }
                 });
                 if (req.body.seats) {
-                    const promises = req.body.seats.map (
+                    const promises = req.body.seats.map(
                         async seat => {
                             const createdSeat = await Seat.findOrCreate({
                                 where: {
@@ -77,17 +77,21 @@ class Venue_controller {
                     }
                 });
                 if (req.body.seats) {
-                    const promises = req.body.seats.map (
+                    await Seat.destroy({
+                        where: {venueId: venue.id}
+                    });
+                    const promises = req.body.seats.map(
                         async seat => {
                             const createdSeat = await Seat.findOrCreate({
-                                where: {
-                                    venueHall: seat.venueHall ? seat.venueHall : '',
-                                    hallSection: seat.hallSection ? seat.hallSection : '',
-                                    row: seat.row ? seat.row : null,
-                                    seatNumber: seat.seatNumber ? seat.seatNumber : null,
-                                    typeOfSeat: seat.typeOfSeat ? seat.typeOfSeat : 'regular'
+                                    where: {
+                                        venueHall: seat.venueHall ? seat.venueHall : '',
+                                        hallSection: seat.hallSection ? seat.hallSection : '',
+                                        row: seat.row ? seat.row : null,
+                                        seatNumber: seat.seatNumber ? seat.seatNumber : null,
+                                        typeOfSeat: seat.typeOfSeat ? seat.typeOfSeat : 'regular'
+                                    }
                                 }
-                            })
+                            )
                             return await venue.addSeat(createdSeat[0]);
                         }
                     );
@@ -142,7 +146,7 @@ class Venue_controller {
                     id: req.params.id
                 }
             })
-            if(venue) {
+            if (venue) {
                 res.status(201).json(venue);
             } else {
                 res.status(401).json({
