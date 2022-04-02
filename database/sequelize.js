@@ -9,13 +9,7 @@ const sequelize = new Sequelize(keys.dbName, keys.dbUser, keys.dbPwd, {
         freezeTableName: true,
         timestamps: false
     },
-    logging: false,
-    // dialectOptions: {
-    //     ssl: {
-    //         require: true,
-    //         rejectUnauthorized: false
-    //     }
-    // }
+    logging: false
 })
 
 module.exports = sequelize

@@ -87,7 +87,7 @@ class User_controller {
                 where: {
                     email: req.body.email
                 }
-            })
+            });
             if (!candidate) {
                 res.status(404).json({
                     message: 'EMAIL_NOT_FOUND'
